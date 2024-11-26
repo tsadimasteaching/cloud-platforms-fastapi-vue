@@ -7,7 +7,7 @@ spec:
   selector:
     component: fastapi
   ports:
-    - port: 8000
-      targetPort: 8000
+    - port: 5000
+      targetPort: 5000
       name: fastapi
       protocol: TCP
