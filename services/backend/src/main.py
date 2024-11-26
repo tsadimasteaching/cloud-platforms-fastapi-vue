@@ -18,13 +18,23 @@ from src.routes import users, notes
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://tsadimas-vue.ddns.net",
+    "https://tsadimas-vue.ddns.net",
+    "http://tsadimas-fastapi.ddns.net",
+    "https://tsadimas-fastapi.ddns.net",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE","OPTIONS"],
     allow_headers=["*"],
 )
+
 app.include_router(users.router)
 app.include_router(notes.router)
 
