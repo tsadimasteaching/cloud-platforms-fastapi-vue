@@ -1,0 +1,179 @@
+---
+- hosts: appservers
+
+  vars:
+    user_dir: "/home/vagrant"
+    app_dir: "{{user_dir}}/fastapi"
+    git_repo_url: "https://github.com/tsadimasteaching/cloud-platforms-fastapi-vue.git"
+    git_repo_branch: "main"
+    app_port: 8000
+
+  tasks:
+
+  - name: ensure github.com is a known host
+    lineinfile:
+      dest: "{{user_dir}}/.ssh/known_hosts"
+      create: yes
+      state: present
+      line: "{{lookup('pipe', 'ssh-keyscan -t rsa github.com')}}"
+      regexp: "^github\\.com"
+
+
+  - name: Clone repository without checkout
+    git:
+      repo: "https://github.com/tsadimasteaching/cloud-platforms-fastapi-vue.git"
+      dest: "/tmp/repo"
+      bare: no
+      clone: yes
+      update: yes
+      force: yes
+
+  - name: Enable sparse checkout
+    command: git sparse-checkout init --cone
+    args:
+      chdir: /tmp/repo
+
+  - name: Set sparse checkout path
+    command: git sparse-checkout set services/backend
+    args:
+      chdir: /tmp/repo
+
+  - name: Checkout main branch
+    command: git checkout main
+    args:
+      chdir: /tmp/repo
+
+  - name: Remove cloned repository (optional cleanup)
+    file:
+      path: "{{app_dir}}"
+      state: absent
+
+  - name: Move extracted directory to the final destination
+    command: mv /tmp/repo/services/backend "{{app_dir}}"
+
+  - name: Remove cloned repository (optional cleanup)
+    file:
+      path: "/tmp/repo"
+      state: absent
+
+
+
+  - name: copy env file
+    shell : "cp {{app_dir}}/src/.env.example {{app_dir}}/src/.env"
+
+  - name: populate  ~/.env
+    lineinfile:
+      dest: "{{app_dir}}/src/.env"
+      state: present
+      regexp: "^{{item.key}}="
+      line: "{{item.key}}='{{item.value}}'"
+    with_items:
+      - "{{app.env | dict2items}}"
+
+
+
+  - name: install and activate virtual environment
+    block:
+    - name: setup virtual environment
+      pip:
+        requirements: "{{app_dir}}/requirements.txt"
+        virtualenv: "{{app_dir}}/favenv"
+        virtualenv_python: python3
+        state: forcereinstall
+    rescue:
+    - name: "APT - install misc packages"
+      apt:
+        name: [python3, python3-pip, python3-virtualenv, virtualenv, libpq-dev]
+        update_cache: yes
+      become: yes
+      become_user: root
+      when: hostvars[inventory_hostname].ansible_distribution == 'Ubuntu'
+    always:
+
+    - name: setup virtual environment
+      pip:
+        requirements: "{{app_dir}}/requirements.txt"
+        virtualenv: "{{app_dir}}/favenv"
+        virtualenv_python: python3
+        state: forcereinstall
+
+    - name: copy fastapi service file
+      template:
+        src: ../files/uvicorn.service.j2
+        dest: "/etc/systemd/system/uvicorn.service"
+      become: yes
+      become_user: root
+      notify: restart uvicorn
+
+    - name: ensure uvicorn service started
+      service:
+        name: uvicorn
+        state: started
+        enabled: yes
+      become: yes
+
+  - name: install and configure nginx
+    block:
+
+    - name: "APT - install nginx"
+      apt:
+        name: nginx
+        update_cache: yes
+
+    - name: copy nginx conf file
+      template:
+        src: ../files/nginx/demo.nginx.j2
+        dest: "/etc/nginx/sites-available/fastapi"
+
+    # - name: copy nginx https conf file
+    #   template:
+    #     src: ../files/nginx/demo.https.nginx.j2
+    #     dest: "/etc/nginx/sites-available/fastapissl"
+
+
+  #   - name: copy certificates
+  #     copy:
+  #       src: "{{item}}"
+  #       dest: /etc/ssl/private/
+  #     with_items:
+  #       - ../files/certs/server.crt
+  #       - ../files/certs/server.key
+
+
+    - name: enable fastapi site in nginx
+      file:
+        src: "/etc/nginx/sites-available/fastapi"
+        dest: "/etc/nginx/sites-enabled/fastapi"
+        state: link
+      notify: restart nginx
+
+  #   - name: enable fastapissl site in nginx
+  #     file:
+  #       src: "/etc/nginx/sites-available/fastapissl"
+  #       dest: "/etc/nginx/sites-enabled/fastapissl"
+  #       state: link
+  #     notify: restart nginx
+
+    - name: de-activate default nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: restart nginx
+
+    become: yes
+    become_user: root
+
+
+  handlers:
+
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes
+
+  - name: restart uvicorn
+    service:
+      name: uvicorn
+      state: restarted
+    become: yes
