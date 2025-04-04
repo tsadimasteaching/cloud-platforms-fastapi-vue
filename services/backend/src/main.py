@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise import Tortoise
-
+import os 
 from src.database.register import register_tortoise
 from src.database.config import TORTOISE_ORM
 
@@ -40,6 +40,8 @@ app.include_router(notes.router)
 
 register_tortoise(app, config=TORTOISE_ORM, generate_schemas=False)
 
+
+print(os.environ.get("DATABASE_URL"))
 
 @app.get("/")
 def home():
