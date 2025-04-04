@@ -163,6 +163,15 @@
     become: yes
     become_user: root
 
+
+
+  - name: Run aerich db config
+    ansible.builtin.command:
+      cmd: "{{user_dir}}/fastapi/favenv/bin/aerich init -t src.database.config.TORTOISE_ORM"
+    args:
+      chdir: "{{user_dir}}/fastapi"
+
+
   - name: Run aerich init
     ansible.builtin.command:
       cmd: "{{user_dir}}/fastapi/favenv/bin/aerich init-db"
