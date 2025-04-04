@@ -6,7 +6,7 @@
 *.*~
 *.swp
 
-.vagrant
+**/.vagrant/
 *.pub
 *.log
 

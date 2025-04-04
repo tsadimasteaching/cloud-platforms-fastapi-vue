@@ -7,6 +7,8 @@ User=vagrant
 Group=www-data
 WorkingDirectory={{service.workingdir}}
 ExecStart={{service.execstart}}
+StandardOutput=append:/var/log/fastapi.log
+StandardError=append:/var/log/fastapi-error.log
 
 [Install]
 WantedBy=multi-user.target

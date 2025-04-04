@@ -59,11 +59,11 @@
 
 
   - name: copy env file
-    shell : "cp {{app_dir}}/src/.env.example {{app_dir}}/src/.env"
+    shell : "cp {{app_dir}}/src/database/.env.example {{app_dir}}/src/database/.env"
 
   - name: populate  ~/.env
     lineinfile:
-      dest: "{{app_dir}}/src/.env"
+      dest: "{{app_dir}}/src/database/.env"
       state: present
       regexp: "^{{item.key}}="
       line: "{{item.key}}='{{item.value}}'"
@@ -162,6 +162,20 @@
 
     become: yes
     become_user: root
+
+  - name: Run aerich init
+    ansible.builtin.command:
+      cmd: "{{user_dir}}/fastapi/favenv/bin/aerich init-db"
+    args:
+      chdir: "{{user_dir}}/fastapi"
+
+  - name: Run aerich upgrade
+    ansible.builtin.command:
+      cmd: "{{user_dir}}/fastapi/favenv/bin/aerich upgrade"
+    args:
+      chdir: "{{user_dir}}/fastapi"
+  
+
 
 
   handlers:

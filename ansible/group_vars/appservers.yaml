@@ -1,6 +1,6 @@
 app:
   env:
-    DATABASE_URL: 'sqlite:///test.db'
+    DATABASE_URL: 'postgres://appuser:apppassword@dbserver:5432/appdb'
 
 service:
   workingdir: "{{app_dir}}"
