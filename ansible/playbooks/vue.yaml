@@ -1,0 +1,174 @@
+---
+- hosts: appservers
+
+  vars:
+    user_dir: "/home/vagrant"
+    app_dir: "{{user_dir}}/vue"
+    git_repo_url: "https://github.com/tsadimasteaching/cloud-platforms-fastapi-vue.git"
+    git_repo_branch: "main"
+    app_port: 8000
+    site_location: /var/www/vue
+
+
+  pre_tasks:
+
+    - name: Find my public ip
+      uri:
+        url: http://ifconfig.me/ip
+        return_content: yes
+      register: ip_response
+
+    - name: See public ip
+      debug:
+        var: ip_response.content
+
+    - name: Install Nginx
+      package:
+        name: nginx
+        state: latest
+      become: yes
+
+    - name: Install nvm
+      shell: |
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+      args:
+        executable: /bin/bash
+        chdir: "$HOME"
+        creates: "$HOME/.nvm/nvm.sh"
+
+    - name: Setup .profile
+      ansible.builtin.lineinfile:
+        path: ~/.profile
+        line: source ~/.nvm/nvm.sh # This will make sure Node is on the user's PATH
+        create: yes
+
+    - name: "debug"
+      ansible.builtin.debug:
+        msg: "PATH : {{ ansible_env.PATH }}"
+      
+    - name: Install node
+      shell: |
+        source $HOME/.nvm/nvm.sh && nvm install 20.12.1
+      args:
+        executable: /bin/bash
+        chdir: "$HOME"
+        creates: "$HOME/.nvm/versions/node/v20.12.1"
+  
+    - name: Install Git
+      package:
+        name: git
+        state: latest
+      become: yes
+
+  tasks:
+
+  - name: ensure github.com is a known host
+    lineinfile:
+      dest: "{{user_dir}}/.ssh/known_hosts"
+      create: yes
+      state: present
+      line: "{{lookup('pipe', 'ssh-keyscan -t rsa github.com')}}"
+      regexp: "^github\\.com"
+
+
+  - name: Clone repository without checkout
+    git:
+      repo: "https://github.com/tsadimasteaching/cloud-platforms-fastapi-vue.git"
+      dest: "/tmp/repo"
+      bare: no
+      clone: yes
+      update: yes
+      force: yes
+
+  - name: Enable sparse checkout
+    command: git sparse-checkout init --cone
+    args:
+      chdir: /tmp/repo
+
+  - name: Set sparse checkout path
+    command: git sparse-checkout set services/frontend
+    args:
+      chdir: /tmp/repo
+
+  - name: Checkout main branch
+    command: git checkout main
+    args:
+      chdir: /tmp/repo
+
+  - name: Remove cloned repository (optional cleanup)
+    file:
+      path: "{{app_dir}}"
+      state: absent
+
+  - name: Move extracted directory to the final destination
+    command: mv /tmp/repo/services/frontend "{{app_dir}}"
+
+  - name: Remove cloned repository (optional cleanup)
+    file:
+      path: "/tmp/repo"
+      state: absent
+
+  - name: copy env file
+    shell : "cp {{app_dir}}/.env.example {{app_dir}}/.env"
+
+  - name: populate  ~/.env
+    lineinfile:
+      dest: "{{app_dir}}/.env"
+      state: present
+      regexp: "^{{item.key}}="
+      line: "{{item.key}}='{{item.value}}'"
+    with_items:
+      - "{{app | dict2items}}"
+
+  - name: "Install dependencies"
+    shell: |
+      export PATH=$PATH:~/.nvm/versions/node/v20.12.1/bin; npm install
+    args:
+      chdir: "{{ app_dir }}"
+
+  - name: "Build the Vue.js application"
+    shell: |
+      export PATH=$PATH:~/.nvm/versions/node/v20.12.1/bin; npm run build
+    args:
+      chdir: "{{ app_dir }}"
+  
+  - name: Copy dist in nginx location 
+    copy:
+      src: "{{ app_dir }}/dist/"
+      dest: "{{ site_location }}"
+      remote_src: True
+      mode: 7777
+      force: true
+    notify: restart nginx
+    become: yes
+
+  - name: copy nginx conf file
+    template:
+      src: ../files/nginx/nginx.vue.j2
+      dest: "/etc/nginx/sites-available/vue"
+    become: yes
+
+  - name: enable vue site in nginx
+    file:
+      src: "/etc/nginx/sites-available/vue"
+      dest: "/etc/nginx/sites-enabled/vue"
+      state: link
+    become: yes
+  
+
+  - name: de-activate default nginx site
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    become: yes
+    notify: restart nginx
+    
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
+    
+
+  

@@ -1,6 +1,8 @@
 app:
   env:
     DATABASE_URL: 'postgres://appuser:apppassword@dbserver:5432/appdb'
+    VUE_APP_API_URL:  http://192.168.56.103
+backend_server_url: "http://192.168.56.101:8000"
 
 service:
   workingdir: "{{app_dir}}"
