@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join("database", ".env"))
 
-
+print('secret')
 print(os.environ.get("SECRET_KEY"))
 
 # enable schemas to read relationship between models
