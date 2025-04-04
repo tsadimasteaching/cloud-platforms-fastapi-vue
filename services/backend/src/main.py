@@ -4,7 +4,12 @@ from tortoise import Tortoise
 import os 
 from src.database.register import register_tortoise
 from src.database.config import TORTOISE_ORM
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=os.path.join("database", ".env"))
+
+
+print(os.environ.get("SECRET_KEY"))
 
 # enable schemas to read relationship between models
 Tortoise.init_models(["src.database.models"], "models")
