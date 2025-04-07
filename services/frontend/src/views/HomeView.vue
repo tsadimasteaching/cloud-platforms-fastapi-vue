@@ -7,6 +7,7 @@
     </div>
     <p v-else>
       <router-link to="/register">Register</router-link>
+      <br/>
       <router-link to="/login">Log In</router-link>
     </p>
   </section>
