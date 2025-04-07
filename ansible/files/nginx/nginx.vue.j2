@@ -9,7 +9,7 @@ root /var/www/vue;
 try_files $uri $uri/ /index.html;
 }
 
-location /login /register /notes  {
+location /login {
 proxy_set_header Host $http_host;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
@@ -18,6 +18,23 @@ proxy_buffering off;
 proxy_pass {{backend_server_url}};
 }
 
+location /register  {
+proxy_set_header Host $http_host;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_redirect off;
+proxy_buffering off;
+proxy_pass {{backend_server_url}};
+}
+
+location  /notes {
+proxy_set_header Host $http_host;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_redirect off;
+proxy_buffering off;
+proxy_pass {{backend_server_url}};
+}
 
 
 

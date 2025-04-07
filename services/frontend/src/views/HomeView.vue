@@ -6,9 +6,8 @@
       <p id="logout">Click <a href="/dashboard">here</a> to view all notes.</p>
     </div>
     <p v-else>
-      <span><a href="/register">Register</a></span>
-      <span> or </span>
-      <span><a href="/login">Log In</a></span>
+      <router-link to="/register">Register</router-link>
+      <router-link to="/login">Log In</router-link>
     </p>
   </section>
 </template>
