@@ -16,6 +16,8 @@ appservers:
         ansible_host: devops-gcloud
       azure-db-server:
           ansible_host: devops-azure
+      azure-devops:
+          ansible_host: az-devops
       
 
 dbservers:
