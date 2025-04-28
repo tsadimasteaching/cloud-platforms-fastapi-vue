@@ -13,9 +13,9 @@ pipeline {
                     docker compose down --volumes
                     docker compose up backend -d --build
                     while ! wget -S --spider http://localhost:5000/docs; do sleep 1; done
-                    docker-compose exec backend rm -rf ./migrations
-                    docker-compose exec backend aerich init -t src.database.config.TORTOISE_ORM
-                    docker-compose exec backend aerich init-db
+                    docker compose exec backend rm -rf ./migrations
+                    docker compose exec backend aerich init -t src.database.config.TORTOISE_ORM
+                    docker compose exec backend aerich init-db
                     docker compose exec -T backend tavern-ci tests
                     docker compose down --volumes
             '''
