@@ -30,3 +30,11 @@ stages:
       json:
         message: "You've successfully logged in. Welcome back!"
   
+  - name: add a note
+
+    request:
+      url: http://localhost:5000/notes
+      method: POST
+      json:
+        title: "My first note"
+        content: "This is the

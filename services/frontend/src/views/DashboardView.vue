@@ -2,7 +2,7 @@
   <div>
     <section>
       <h1>Add new note</h1>
-      <hr/><br/>
+      <hr /><br />
 
       <form @submit.prevent="submit">
         <div class="mb-3">
@@ -11,23 +11,19 @@
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">Content:</label>
-          <textarea
-            name="content"
-            v-model="form.content"
-            class="form-control"
-          ></textarea>
+          <textarea name="content" v-model="form.content" class="form-control"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </section>
 
-    <br/><br/>
+    <br /><br />
 
     <section>
       <h1>Notes</h1>
-      <hr/><br/>
+      <hr /><br />
 
-      <div v-if="notes.length">
+      <div v-if="notes && notes.length">
         <div v-for="note in notes" :key="note.id" class="notes">
           <div class="card" style="width: 18rem;">
             <div class="card-body">
@@ -38,7 +34,7 @@
               </ul>
             </div>
           </div>
-          <br/>
+          <br />
         </div>
       </div>
 
