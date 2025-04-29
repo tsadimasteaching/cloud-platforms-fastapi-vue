@@ -20,6 +20,13 @@ npm run build
 npm run lint
 ```
 
+
+## Run tests
+
+
+```bash
+npx cypress run --headless --spec "cypress/e2e/login.cy.js"
+```
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 

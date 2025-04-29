@@ -3,13 +3,13 @@
     <form @submit.prevent="submit">
       <div class="mb-3">
         <label for="username" class="form-label">Username:</label>
-        <input type="text" name="username" v-model="form.username" class="form-control" />
+        <input type="text" name="username" v-model="form.username" class="form-control" data-cy="username" />
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Password:</label>
-        <input type="password" name="password" v-model="form.password" class="form-control" />
+        <input type="password" name="password" v-model="form.password" class="form-control" data-cy="password" />
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary" data-cy="login-button">Submit</button>
     </form>
   </section>
 </template>
