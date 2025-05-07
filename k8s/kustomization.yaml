@@ -1,7 +1,13 @@
+resources:
+  - .
+  
 configMapGenerator:
   - name: fastapi-config
     envs:
       - fastapi/fastapi.env
+  - name: vue-config
+    envs:
+      - vue/vue.env
 
 generatorOptions:
   disableNameSuffixHash: true
