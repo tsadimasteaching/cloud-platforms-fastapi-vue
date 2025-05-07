@@ -2,6 +2,12 @@ resources:
   - ./db/postgres-deployment.yaml
   - ./db/postgres-pvc.yaml
   - ./db/postgres-svc.yaml
+  - ./fastapi/fastapi-deployment.yaml
+  - ./fastapi/fastapi-svc.yaml
+  - ./vue/vue-deployment.yaml
+  - ./vue/vue-svc.yaml
+  - ./vue/vue-ingress.yaml
+
 
 
 configMapGenerator:
