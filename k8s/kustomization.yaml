@@ -1,7 +1,8 @@
 resources:
-  - ./db
-  - ./fastapi
-  - ./vue
+  - ./db/postres-deployment.yaml
+  - ./db/postres-pvc.yaml
+  - ./db/postres-svc.yaml
+
 
 configMapGenerator:
   - name: fastapi-config
