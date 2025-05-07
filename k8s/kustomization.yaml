@@ -1,6 +1,8 @@
 resources:
-  - .
-  
+  - ./db
+  - ./fastapi
+  - ./vue
+
 configMapGenerator:
   - name: fastapi-config
     envs:
