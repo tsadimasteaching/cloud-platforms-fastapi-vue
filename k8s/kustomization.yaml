@@ -1,7 +1,7 @@
 resources:
-  - ./db/postres-deployment.yaml
-  - ./db/postres-pvc.yaml
-  - ./db/postres-svc.yaml
+  - ./db/postgres-deployment.yaml
+  - ./db/postgres-pvc.yaml
+  - ./db/postgres-svc.yaml
 
 
 configMapGenerator:
