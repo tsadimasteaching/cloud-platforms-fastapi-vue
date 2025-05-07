@@ -1,7 +1,0 @@
-configMapGenerator:
-  - name: fastapi-config
-    envs:
-      - fastapi.env
-
-generatorOptions:
-  disableNameSuffixHash: true
