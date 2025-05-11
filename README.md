@@ -26,3 +26,17 @@ docker-compose exec backend rm -rf ./migrations
 docker-compose exec backend aerich init -t src.database.config.TORTOISE_ORM
 docker-compose exec backend aerich init-db
 ```
+
+
+# pull secret
+
+
+```bash
+
+kubectl create secret docker-registry github-pull-secret \
+  --docker-server=ghcr.io \
+  --docker-username=YOUR-USERNAME \
+  --docker-password="YOUR-TOKEN" \
+  --docker-email=tsadimas@hua.gr \
+  --namespace=default
+  ```

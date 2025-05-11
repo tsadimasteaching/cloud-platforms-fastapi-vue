@@ -12,6 +12,7 @@ spec:
       labels:
         component: vue
     spec:
+      serviceAccountName: pull-sa
       containers:
         - name: vue
           image: 'tsadimas/vue-cp:0.1'

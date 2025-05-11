@@ -12,6 +12,7 @@ spec:
       labels:
         component: fastapi
     spec:
+      serviceAccountName: pull-sa
       containers:
         - name: fastapi
           image: 'tsadimas/fastapi-cp:0.4'
