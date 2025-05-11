@@ -51,6 +51,8 @@ pipeline {
                         sed -i 's#\\(image: \\)[^ ]*#\\1${DOCKER_PREFIX}:${IMAGE_TAG}#' ${DEPLOY_DIR}/fastapi/fastapi-deployment.yaml
                     """
                     sh """
+                        git fetch origin ${GIT_BRANCH}
+                        git checkout ${GIT_BRANCH}
                         git add ${DEPLOY_DIR}/fastapi/fastapi-deployment.yaml
                         git commit -m "Update fastapi image to ${DOCKER_PREFIX}:${IMAGE_TAG}" || echo "No changes to commit"
                         git push origin ${GIT_BRANCH}
