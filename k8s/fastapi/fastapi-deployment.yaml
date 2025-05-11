@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: 'tsadimas/fastapi-cp:0.4'
+          image: ghcr.io/tsadimas/cp-backend:8b60717-7
           ports:
             - containerPort: 5000
           envFrom:
