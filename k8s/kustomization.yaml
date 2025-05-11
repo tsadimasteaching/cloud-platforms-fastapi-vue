@@ -1,5 +1,5 @@
 resources:
-  - ./k8s/pull-secret-sa.yaml
+  - ./pull-secret-sa.yaml
   - ./db/postgres-deployment.yaml
   - ./db/postgres-pvc.yaml
   - ./db/postgres-svc.yaml
