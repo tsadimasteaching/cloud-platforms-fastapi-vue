@@ -27,20 +27,28 @@ pipeline {
 
         stage('read secrets') {
             steps {
-                 withVault(
-                    vaultSecrets: [
-                        [path: 'secret/jenkins', secretValues: [
+                    withVault(
+                    [
+                        vaultSecrets: [
+                        [
+                            path: 'secret/jenkins',
+                            secretValues: [
                             [envVar: 'USERNAME', vaultKey: 'username'],
                             [envVar: 'PASSWORD', vaultKey: 'password']
-                        ]]
-                    ],
-                    vaultCredentialId: '2fcd4aed-8ddc-4f97-a856-4c85080ade91	'
-                ) {
+                            ]
+                        ]
+                        ],
+                        vaultConfiguration: [
+                        vaultUrl: 'http://127.0.0.1:8200',
+                        vaultCredentialId: '2fcd4aed-8ddc-4f97-a856-4c85080ade91'
+                        ]
+                    ]
+                    ) {
                     sh '''
-                      echo "Vault Username: $USERNAME"
-                      echo "Vault Password: $PASSWORD"
+                        echo "Username is $USERNAME"
+                        echo "Password is $PASSWORD"
                     '''
-                }
+                    }
             }
         }
         stage('docker build and push') {
