@@ -27,27 +27,34 @@ pipeline {
 
         stage('read secrets') {
             steps {
-                    withVault(
-                        configuration: [
-                            vaultUrl: 'http://127.0.0.1:8200',
-                            vaultCredentialId: 'vtoken'
-                        ],
-                        vaultSecrets: [
-                            [
-                            path: 'secret/jenkins',
-                            kvVersion: 1,
-                            secretValues: [
-                                [envVar: 'USERNAME', vaultKey: 'username'],
-                                [envVar: 'PASSWORD', vaultKey: 'password']
-                            ]
-                            ]
-                        ]
-                        ) {
-                        sh '''
-                            echo "Vault USERNAME: $USERNAME"
-                            echo "Vault PASSWORD: $PASSWORD"
-                        '''
-                        }
+                    script {
+                    // Define the Vault URL and token
+                    def vaultUrl = 'http://127.0.0.1:8200'  // Replace with your Vault URL
+                    def vaultToken = 'hvs.ziBNrDLkoXfB7n8EeHKr5G62'  // Your Vault Token
+
+                    // Define the secret path
+                    def secretPath = 'secret/jenkins'
+
+                    // Fetch the secret from Vault using curl
+                    def response = sh(script: """
+                        curl --header "X-Vault-Token: ${vaultToken}" \
+                             --request GET \
+                             ${vaultUrl}/v1/${secretPath}
+                    """, returnStdout: true).trim()
+
+                    // Parse the response and extract the secret
+                    def jsonResponse = readJSON text: response
+                    def username = jsonResponse.data.username
+                    def password = jsonResponse.data.password
+
+                    // Use the secrets in your Jenkins build
+                    echo "Vault USERNAME: ${username}"
+                    echo "Vault PASSWORD: ${password}"
+
+                    // Optionally, you can use these values as environment variables
+                    env.USERNAME = username
+                    env.PASSWORD = password
+                }
             }
         }
         stage('docker build and push') {
