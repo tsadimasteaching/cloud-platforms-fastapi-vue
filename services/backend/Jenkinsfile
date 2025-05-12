@@ -34,7 +34,7 @@ pipeline {
                             [envVar: 'PASSWORD', vaultKey: 'password']
                         ]]
                     ],
-                    vaultCredentialId: 'vault-token'
+                    vaultCredentialId: '2fcd4aed-8ddc-4f97-a856-4c85080ade91	'
                 ) {
                     sh '''
                       echo "Vault Username: $USERNAME"
