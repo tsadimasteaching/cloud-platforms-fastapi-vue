@@ -60,6 +60,7 @@ pipeline {
                         env.USERNAME = username
                         env.PASSWORD = password
             }
+                  }
         }
         stage('docker build and push') {
             steps {
