@@ -30,7 +30,7 @@ pipeline {
                     withVault(
                         configuration: [
                             vaultUrl: 'http://127.0.0.1:8200',
-                            vaultCredentialId: '2fcd4aed-8ddc-4f97-a856-4c85080ade91'
+                            vaultCredentialId: 'vault-token'
                         ],
                         vaultSecrets: [
                             [
