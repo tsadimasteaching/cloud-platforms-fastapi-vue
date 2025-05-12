@@ -7,6 +7,7 @@ pipeline {
         DOCKER_PREFIX = 'ghcr.io/tsadimas/cp-backend'
         DEPLOY_DIR = 'k8s'
         GIT_BRANCH = 'main' // or whatever branch you deploy from
+        VAULT_ADDR = 'http://127.0.0.1:8200'
     }
     stages {
         stage('test') {
@@ -21,6 +22,25 @@ pipeline {
                     docker compose exec -T backend tavern-ci tests
                     docker compose down --volumes
                 '''
+            }
+        }
+
+        stage('read secrets') {
+            steps {
+                 withVault(
+                    vaultSecrets: [
+                        [path: 'secret/jenkins', secretValues: [
+                            [envVar: 'USERNAME', vaultKey: 'username'],
+                            [envVar: 'PASSWORD', vaultKey: 'password']
+                        ]]
+                    ],
+                    vaultCredentialId: 'vault-token'
+                ) {
+                    sh '''
+                      echo "Vault Username: $USERNAME"
+                      echo "Vault Password: $PASSWORD"
+                    '''
+                }
             }
         }
         stage('docker build and push') {

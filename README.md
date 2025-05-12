@@ -74,3 +74,68 @@ kubectl create secret docker-registry github-pull-secret --from-file=.dockerconf
 
 
 
+
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo update
+
+helm install vault hashicorp/vault \
+  --namespace vault \
+  --create-namespace \
+  --set server.ha.enabled=false \
+  --set server.dataStorage.enabled=true \
+  --set server.dataStorage.size=1Gi \
+  --set server.dataStorage.storageClass=microk8s-hostpath
+
+
+vault operator init (copy root token )
+
+vault operator unseal <unseal-key-1>
+vault operator unseal <unseal-key-2>
+vault operator unseal <unseal-key-3>
+
+
+## install vault cli (apt)
+
+## port-forward and use it
+kubectl port-forward svc/vault 8200:8200 -n vault
+export VAULT_ADDR="http://127.0.0.1:8200"
+vault status
+vault login <token>
+vault secrets enable kv
+vault secrets enable -path=secret kv
+
+## enable vault access to kubernetes
+vault auth enable kubernetes
+
+
+(from exec into vault pod)
+vault login <token>
+
+vault write auth/kubernetes/config \
+token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+kubernetes_host="https://${KUBERNETES_PORT_443_TCP_ADDR}:443" \
+kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+create a policy
+
+
+
+
+
+vault kv put secret/jenkins username=rg password=alekos1111
+
+
+
+vault policy write jenkins-policy policy.hcl
+
+Bind Kubernetes service account to Vault:
+
+vault write auth/kubernetes/role/jenkins-role \
+bound_service_account_names=jenkins \
+bound_service_account_namespaces=default \
+policies=jenkins-policy \
+ttl=24h
+
+
+## Jenkins
+
