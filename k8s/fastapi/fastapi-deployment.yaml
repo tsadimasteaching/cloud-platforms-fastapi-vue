@@ -15,7 +15,7 @@ spec:
       serviceAccountName: pull-sa
       containers:
         - name: fastapi
-          image: ghcr.io/tsadimas/cp-backend:42b15bf-24
+          image: ghcr.io/tsadimas/cp-backend:1a7fed4-26
           ports:
             - containerPort: 5000
           envFrom:
