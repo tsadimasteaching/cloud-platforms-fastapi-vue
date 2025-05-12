@@ -31,12 +31,46 @@ docker-compose exec backend aerich init-db
 # pull secret
 
 
+# Container Registry (github packages)
+
+## Github Packages
+* create personal access token (settings --> Developer settings -- > Personal Access Tokens), select classic
+* select write:packages
+* save the token to a file
+* to see packages, go to your github profile and select tab Packages
+* tag an image
+```bash
+docker build -t ghcr.io/<GITHUB-USERNAME>/image-name:latest -f Dockerfile .
+```
+* login to docker registry
+```bash
+cat ~/github-image-repo.txt | docker login ghcr.io -u <GITHUB-USERNAME> --password-stdin
+```
+* push image
+```bash
+docker push ghcr.io/<GITHUB-USERNAME>/image-name:latest
+```
+
+## create dockercongig secret
+create a file with name .dockerconfig.json using this template
+
 ```bash
 
-kubectl create secret docker-registry github-pull-secret \
-  --docker-server=ghcr.io \
-  --docker-username=YOUR-USERNAME \
-  --docker-password="YOUR-TOKEN" \
-  --docker-email=tsadimas@hua.gr \
-  --namespace=default
-  ```
+  {
+    "auths": {
+        "https://ghcr.io":{
+            "username":"REGISTRY_USERNAME",
+            "password":"REGISTRY_TOKEN",
+            "email":"REGISTRY_EMAIL",
+            "auth":"BASE_64_BASIC_AUTH_CREDENTIALS"
+    	}
+    }
+}
+```
+
+```bash
+kubectl create secret docker-registry github-pull-secret --from-file=.dockerconfigjson=.dockerconfig.json
+```
+
+
+
