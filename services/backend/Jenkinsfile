@@ -89,9 +89,11 @@ pipeline {
                 script {
                     // Update deployment yaml
                     sh """
+                    git reset --hard
                     git fetch origin ${GIT_BRANCH}
                     git checkout ${GIT_BRANCH}
-                    
+                    git pull origin ${GIT_BRANCH}   # <---- ADD this line
+
                     sed -i 's#\\(image: \\)[^ ]*#\\1${DOCKER_PREFIX}:${IMAGE_TAG}#' ${DEPLOY_DIR}/fastapi/fastapi-deployment.yaml
 
                     git config --global user.email "tsadimas@hua.gr"
