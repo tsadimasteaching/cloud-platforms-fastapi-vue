@@ -27,34 +27,38 @@ pipeline {
 
         stage('read secrets') {
             steps {
+                  withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
                     script {
-                    // Define the Vault URL and token
-                    def vaultUrl = 'http://127.0.0.1:8200'  // Replace with your Vault URL
-                    def vaultToken = 'hvs.ziBNrDLkoXfB7n8EeHKr5G62'  // Your Vault Token
+                        // Define the Vault URL (adjust if needed)
+                        def vaultUrl = 'http://127.0.0.1:8200'  // Replace with your Vault URL
 
-                    // Define the secret path
-                    def secretPath = 'secret/jenkins'
+                        // Define the secret path in Vault (adjust if needed)
+                        def secretPath = 'secret/jenkins'
 
-                    // Fetch the secret from Vault using curl
-                    def response = sh(script: """
-                        curl --header "X-Vault-Token: ${vaultToken}" \
-                             --request GET \
-                             ${vaultUrl}/v1/${secretPath}
-                    """, returnStdout: true).trim()
+                        // Fetch the secret from Vault using curl
+                        def response = sh(script: """
+                            curl --silent --fail --header "X-Vault-Token: ${VAULT_TOKEN}" \
+                                 --request GET \
+                                 ${vaultUrl}/v1/${secretPath}
+                        """, returnStdout: true).trim()
 
-                    // Parse the response and extract the secret
-                    def jsonResponse = readJSON text: response
-                    def username = jsonResponse.data.username
-                    def password = jsonResponse.data.password
+                        // Check if the response is empty (error handling)
+                        if (!response) {
+                            error "Failed to fetch secrets from Vault. Response is empty."
+                        }
 
-                    // Use the secrets in your Jenkins build
-                    echo "Vault USERNAME: ${username}"
-                    echo "Vault PASSWORD: ${password}"
+                        // Parse the response (JSON) and extract the secret values
+                        def jsonResponse = readJSON text: response
+                        def username = jsonResponse.data.username
+                        def password = jsonResponse.data.password
 
-                    // Optionally, you can use these values as environment variables
-                    env.USERNAME = username
-                    env.PASSWORD = password
-                }
+                        // Use the secrets in your Jenkins build
+                        echo "Vault USERNAME: ${username}"
+                        echo "Vault PASSWORD: ${password}"
+
+                        // Optionally, you can use these values as environment variables
+                        env.USERNAME = username
+                        env.PASSWORD = password
             }
         }
         stage('docker build and push') {
