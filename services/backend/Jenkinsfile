@@ -34,7 +34,7 @@ pipeline {
                         def vaultUrl = 'http://127.0.0.1:8200'  // Replace with your Vault URL
 
                         // Define the secret path in Vault (adjust if needed)
-                        def secretPath = 'secret/jenkins'
+                        def secretPath = 'secret/sample-secret'
 
                         // Fetch the secret from Vault using curl
                         def response = sh(script: """

@@ -122,7 +122,7 @@ create a policy
 
 
 
-vault kv put secret/jenkins username=rg password=alekos1111
+vault kv put secret/sample-secret username=user password=pass123
 
 
 
@@ -138,4 +138,4 @@ ttl=24h
 
 
 ## Jenkins
-
+install Pipeline Utility Steps
