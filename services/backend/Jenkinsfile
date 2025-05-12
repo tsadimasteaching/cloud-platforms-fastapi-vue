@@ -30,11 +30,12 @@ pipeline {
                     withVault(
                         configuration: [
                             vaultUrl: 'http://127.0.0.1:8200',
-                            vaultCredentialId: 'v2'
+                            vaultCredentialId: 'vtoken'
                         ],
                         vaultSecrets: [
                             [
                             path: 'secret/jenkins',
+                            kvVersion: 1,
                             secretValues: [
                                 [envVar: 'USERNAME', vaultKey: 'username'],
                                 [envVar: 'PASSWORD', vaultKey: 'password']
