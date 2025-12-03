@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-traefic-ingress
+  annotations:
+    # Old NGINX annotation (remove this)
+    # kubernetes.io/ingress.class: nginx
+    # New Traefik annotation (add this)
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "fastapi.tsadimas.dns-cloud.net"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: fastapi-clip
+                port:
+                  name: fastapi

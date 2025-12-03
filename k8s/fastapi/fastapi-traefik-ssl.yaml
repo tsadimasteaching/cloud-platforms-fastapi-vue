@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-traefic-ingress
+  annotations:
+    # Tells cert-manager to use the issuer we created in Step 2
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # Standard Traefik annotation (keep this)
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - fastapi.tsadimas.dns-cloud.net
+      # Cert-manager will create this secret automatically containing the cert
+      secretName: fastapi-prod-tls
+  rules:
+    - host: "fastapi.tsadimas.dns-cloud.net"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastapi-clip
+                port:
+                  name: fastapi
