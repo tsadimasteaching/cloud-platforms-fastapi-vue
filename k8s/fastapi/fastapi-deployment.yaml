@@ -12,9 +12,10 @@ spec:
       labels:
         component: fastapi
     spec:
+      serviceAccountName: pull-sa
       containers:
         - name: fastapi
-          image: 'tsadimas/fastapi-cp:0.4'
+          image: ghcr.io/tsadimas/cp-backend:1a7fed4-26
           ports:
             - containerPort: 5000
           envFrom:
