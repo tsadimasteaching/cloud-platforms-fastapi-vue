@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise import Tortoise
-import os 
+import os
 from src.database.register import register_tortoise
 from src.database.config import TORTOISE_ORM
 from dotenv import load_dotenv
@@ -50,4 +50,4 @@ print(os.environ.get("DATABASE_URL"))
 
 @app.get("/")
 def home():
-    return "Hello, World!"
+    return "Check /docs"
